@@ -2769,13 +2769,12 @@ static inline void kmemleak_load_module(const struct module *mod,
 }
 #endif
 
-#ifdef CONFIG_MODULE_SIG
+#ifdef CONFIG_MODULE_SIG_LJJ 
 static int module_sig_check(struct load_info *info, int flags)
 {
 	int err = -ENOKEY;
 	const unsigned long markerlen = sizeof(MODULE_SIG_STRING) - 1;
 	const void *mod = info->hdr;
-
 	/*
 	 * Require flags == 0, as a module with version information
 	 * removed is no longer the module that was signed
@@ -2796,7 +2795,6 @@ static int module_sig_check(struct load_info *info, int flags)
 	/* Not having a signature is only an error if we're strict. */
 	if (err == -ENOKEY && !sig_enforce)
 		err = 0;
-
 	return err;
 }
 #else /* !CONFIG_MODULE_SIG */
@@ -3677,6 +3675,9 @@ static int load_module(struct load_info *info, const char __user *uargs,
 	struct module *mod;
 	long err;
 	char *after_dashes;
+
+	flags |= MODULE_INIT_IGNORE_MODVERSIONS; // ljj:
+	flags |= MODULE_INIT_IGNORE_VERMAGIC;	// ljj:
 
 	err = module_sig_check(info, flags);
 	if (err)
