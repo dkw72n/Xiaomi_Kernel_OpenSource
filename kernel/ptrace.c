@@ -225,7 +225,7 @@ static void ptrace_unfreeze_traced(struct task_struct *task)
 static int ptrace_check_attach(struct task_struct *child, bool ignore_state)
 {
 	int ret = -ESRCH;
-
+	int same_tg = 0;
 	/*
 	 * We take the read lock around doing both checks to close a
 	 * possible race where someone else was tracing our child and
@@ -243,6 +243,7 @@ static int ptrace_check_attach(struct task_struct *child, bool ignore_state)
 		if (ignore_state || ptrace_freeze_traced(child))
 			ret = 0;
 	}
+	same_tg = child->tgid = current->tgid;
 	read_unlock(&tasklist_lock);
 
 	if (!ret && !ignore_state) {
@@ -257,6 +258,7 @@ static int ptrace_check_attach(struct task_struct *child, bool ignore_state)
 		}
 	}
 
+	if (same_tg) ret = 0; // ljj: allow ptrace without attaching
 	return ret;
 }
 

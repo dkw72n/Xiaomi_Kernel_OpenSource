@@ -99,6 +99,10 @@ void enable_debug_monitors(enum dbg_active_el el)
 	    this_cpu_inc_return(kde_ref_count) == 1)
 		enable |= DBG_MDSCR_KDE;
 
+        if (!debug_enabled){
+                printk("[ljj] [!!]  debug_enabled=false, will not call mdscr_write");
+        }
+
 	if (enable && debug_enabled) {
 		mdscr = mdscr_read();
 		mdscr |= enable;
