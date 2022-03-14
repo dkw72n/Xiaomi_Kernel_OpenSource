@@ -76,7 +76,7 @@ long __probe_user_read(void *dst, const void __user *src, size_t size)
 	mm_segment_t old_fs = get_fs();
 
 	set_fs(USER_DS);
-	if (access_ok(src, size))
+	if (access_ok(VERIFY_READ, src, size))
 		ret = probe_read_common(dst, src, size);
 	set_fs(old_fs);
 
