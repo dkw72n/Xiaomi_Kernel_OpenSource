@@ -4895,6 +4895,8 @@ static int fts_mode_handler(struct fts_ts_info *info, int force)
 #ifdef CONFIG_TOUCHSCREEN_XIAOMI_TOUCHFEATURE
 static struct xiaomi_touch_interface xiaomi_touch_interfaces;
 
+int fts_read_touchmode_data(void); /*ljj: suppress -Wstrict-prototypes warning*/
+
 bool inline fts_touchmode_edgefilter(unsigned int touch_id, int x, int y)
 {
 	int i;

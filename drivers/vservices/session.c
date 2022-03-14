@@ -1909,7 +1909,7 @@ int vs_session_handle_message(struct vs_session_device *session,
 	unsigned long flags;
 
 	transport = session->transport;
-
+	(void)transport; /*ljj: suppress unused warning*/
 	service = vs_session_get_service(session, service_id);
 	if (!service) {
 		dev_err(&session->dev, "message for unknown service %d\n",

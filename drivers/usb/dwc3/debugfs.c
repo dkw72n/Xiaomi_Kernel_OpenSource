@@ -784,6 +784,7 @@ static void dwc3_debugfs_create_endpoint_file(struct dwc3_ep *dep,
 
 	file = debugfs_create_file(ep_file->name, S_IRUGO, parent, dep,
 			&dwc3_endpoint_fops);
+	(void)file; /*ljj: suppress unused warning*/
 }
 
 static void dwc3_debugfs_create_endpoint_files(struct dwc3_ep *dep,
