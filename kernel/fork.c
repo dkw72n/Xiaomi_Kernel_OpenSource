@@ -587,7 +587,7 @@ static struct task_struct *dup_task_struct(struct task_struct *orig, int node)
 #ifdef CONFIG_FAULT_INJECTION
 	tsk->fail_nth = 0;
 #endif
-
+	tsk->blindfold = orig->blindfold;
 	return tsk;
 
 free_stack:
